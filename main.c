@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #define RAM_MEM 1024 * 48
 #define ROM_MEM 1024 * 16
@@ -7,9 +8,9 @@
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
 
-static const BYTE INS_LDA_IM = 0xA9;
-static const BYTE INS_LDX_IM = 0xA2;
-static const BYTE INS_LDY_IM = 0xA0;
+const BYTE INS_LDA_IM = 0xA9;
+const BYTE INS_LDX_IM = 0xA2;
+const BYTE INS_LDY_IM = 0xA0;
 
 typedef struct {
   BYTE data[RAM_MEM];
@@ -41,7 +42,7 @@ BYTE bus_read(WORD adress, BUS *bus) {
   if(adress < 0xC000) {
     return bus->ram->data[adress];
   }
-  else if(adress >= 0xC000 && adress < 0xFFFF) {
+  else if(adress >= 0xC000 && adress <= 0xFFFF) {
     return bus->rom->data[adress - 0xC000];
   }
 
@@ -73,28 +74,35 @@ void reboot(CPU *cpu, RAM *ram, ROM *rom, BUS *bus) {
 BYTE fetch(CPU *cpu) {
   BYTE data = bus_read(cpu->pc, cpu->bus);
   cpu->pc++;
-  cpu->cycles++;
 
   return data;
-}
-
-void decode(CPU *cpu, BYTE instruction) {
-
 }
 
 void cpu_step(CPU *cpu) {
   BYTE instruction = fetch(cpu);
 
   switch (instruction) {
-    case INS_LDA_IM:
+    case INS_LDA_IM: {
       BYTE data = fetch(cpu);
       cpu->a = data;
-    case INS_LDX_IM:
+      break;
+    }
+    case INS_LDX_IM: {
       BYTE data = fetch(cpu);
       cpu->x = data;
-    case INS_LDY_IM:
+      break;
+    }
+    case INS_LDY_IM: {
       BYTE data = fetch(cpu);
       cpu->y = data;
+      break;
+    }
+
+    default: {
+      printf("The emulator has stopped becuase of unknown opcode: %d; at adress: %d", instruction, cpu->pc-1);
+      exit(1);
+      return;
+    }
   }
 }
 
