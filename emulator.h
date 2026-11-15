@@ -33,6 +33,23 @@ typedef struct {
     BUS *bus;
 } CPU;
 
+typedef enum {
+    FLAG_C = 0x01,
+    FLAG_Z = 0x02,
+    FLAG_I = 0x04,
+    FLAG_D = 0x08,
+    FLAG_B = 0x10,
+    FLAG_U = 0x20,
+    FLAG_V = 0x40,
+    FLAG_N = 0x80
+} FLAGS;
+
+typedef enum {
+    INS_LDA_IM = 0xA9,
+    INS_LDX_IM = 0xA2,
+    INS_LDY_IM = 0xA0
+} INS;
+
 // Memory
 int rom_load(ROM *rom, char *file_name);
 
